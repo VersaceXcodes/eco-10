@@ -1,0 +1,19 @@
+{
+  "timestamp": 1761306552373,
+  "operation": {
+    "id": "webapp:react:views",
+    "refs": {
+      "id": "GV_LoginModal",
+      "version": "latest"
+    }
+  },
+  "projectId": "eco-10",
+  "files": [
+    {
+      "path": "/mnt/data/eco-10/vitereact/src/components/views/GV_LoginModal.tsx",
+      "type": "text",
+      "size": 7838,
+      "dependencies": false
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "timestamp": 1761306527743,
+  "operation": {
+    "id": "webapp:react:views",
+    "refs": {
+      "id": "UV_EducationalContent_Impact",
+      "version": "1761306346531"
+    }
+  },
+  "projectId": "eco-10",
+  "files": [
+    {
+      "path": "/mnt/data/eco-10/vitereact/src/components/views/UV_EducationalContent_Impact.tsx",
+      "type": "text",
+      "size": 8811,
+      "dependencies": false
+    }
+  ]
+}

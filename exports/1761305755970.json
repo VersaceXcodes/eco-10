@@ -1,0 +1,15 @@
+{
+  "timestamp": 1761305755970,
+  "operation": {
+    "id": "backend:specifications:asyncapi"
+  },
+  "projectId": "eco-10",
+  "files": [
+    {
+      "path": "/mnt/data/eco-10/backend/asyncapi.yaml",
+      "type": "text",
+      "size": 3,
+      "dependencies": false
+    }
+  ]
+}

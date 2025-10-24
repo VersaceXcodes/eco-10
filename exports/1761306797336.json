@@ -1,0 +1,19 @@
+{
+  "timestamp": 1761306797336,
+  "operation": {
+    "id": "webapp:react:views",
+    "refs": {
+      "id": "GV_ShareModal",
+      "version": "1761306704334"
+    }
+  },
+  "projectId": "eco-10",
+  "files": [
+    {
+      "path": "/mnt/data/eco-10/vitereact/src/components/views/GV_ShareModal.tsx",
+      "type": "text",
+      "size": 8179,
+      "dependencies": false
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "timestamp": 1761306472841,
+  "operation": {
+    "id": "webapp:react:views",
+    "refs": {
+      "id": "GV_SetupWizard",
+      "version": "1761306346595"
+    }
+  },
+  "projectId": "eco-10",
+  "files": [
+    {
+      "path": "/mnt/data/eco-10/vitereact/src/components/views/GV_SetupWizard.tsx",
+      "type": "text",
+      "size": 13607,
+      "dependencies": false
+    }
+  ]
+}

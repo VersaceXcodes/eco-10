@@ -1,0 +1,19 @@
+{
+  "timestamp": 1761306509230,
+  "operation": {
+    "id": "webapp:react:views",
+    "refs": {
+      "id": "GV_SettingsPanel",
+      "version": "latest"
+    }
+  },
+  "projectId": "eco-10",
+  "files": [
+    {
+      "path": "/mnt/data/eco-10/vitereact/src/components/views/GV_SettingsPanel.tsx",
+      "type": "text",
+      "size": 9335,
+      "dependencies": false
+    }
+  ]
+}

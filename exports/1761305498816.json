@@ -1,0 +1,15 @@
+{
+  "timestamp": 1761305498816,
+  "operation": {
+    "id": "db:postgres"
+  },
+  "projectId": "eco-10",
+  "files": [
+    {
+      "path": "/mnt/data/eco-10/backend/db.sql",
+      "type": "text",
+      "size": 10187,
+      "dependencies": false
+    }
+  ]
+}

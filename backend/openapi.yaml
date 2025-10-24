@@ -1,0 +1,788 @@
+>-
+```yaml
+
+openapi: 3.0.0
+
+info:
+  title: EcoTrack API
+  description: User-facing API for EcoTrack application
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000/api
+    description: Development server
+
+components:
+  schemas:
+    UserEntity:
+      type: object
+      required: [id, email, password_hash, name, user_type, created_at]
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+          format: email
+        password_hash:
+          type: string
+        name:
+          type: string
+        user_type:
+          type: string
+        location:
+          type: string
+          nullable: true
+        eco_interests:
+          type: object
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    UserImpactEntity:
+      type: object
+      required: [id, user_id, date, daily_score, weekly_score, monthly_score, category_breakdown]
+      properties:
+        id:
+          type: string
+        user_id:
+          type: string
+        date:
+          type: string
+          format: date
+        daily_score:
+          type: number
+        weekly_score:
+          type: number
+        monthly_score:
+          type: number
+        category_breakdown:
+          type: object
+
+    TransportationLogEntity:
+      type: object
+      required: [id, user_id, mode, distance, date]
+      properties:
+        id:
+          type: string
+        user_id:
+          type: string
+        mode:
+          type: string
+        distance:
+          type: number
+        date:
+          type: string
+          format: date
+        start_location:
+          type: string
+          nullable: true
+        end_location:
+          type: string
+          nullable: true
+
+    EnergyLogEntity:
+      type: object
+      required: [id, user_id, energy_type, usage_amount, unit, date]
+      properties:
+        id:
+          type: string
+        user_id:
+          type: string
+        energy_type:
+          type: string
+        usage_amount:
+          type: number
+        unit:
+          type: string
+        date:
+          type: string
+          format: date
+
+    GoalEntity:
+      type: object
+      required: [id, user_id, title, target_value, start_date, end_date, progress, status]
+      properties:
+        id:
+          type: string
+        user_id:
+          type: string
+        title:
+          type: string
+        target_value:
+          type: number
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        progress:
+          type: number
+        status:
+          type: string
+
+    ChallengeEntity:
+      type: object
+      required: [id, title, description, start_date, end_date, rules]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        rules:
+          type: string
+          nullable: true
+
+    TipEntity:
+      type: object
+      required: [id, title, content, category, created_at]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        content:
+          type: string
+        category:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    ForumEntity:
+      type: object
+      required: [id, category, title, content, user_id, created_at]
+      properties:
+        id:
+          type: string
+        category:
+          type: string
+        title:
+          type: string
+        content:
+          type: string
+        user_id:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    AuthResponse:
+      type: object
+      required: [auth_token, user]
+      properties:
+        auth_token:
+          type: string
+        user:
+          $ref: '#/components/schemas/UserEntity'
+
+  parameters:
+    AuthHeader:
+      name: Authorization
+      in: header
+      required: true
+      schema:
+        type: string
+      example: Bearer <token>
+
+    UserIdPath:
+      name: user_id
+      in: path
+      required: true
+      schema:
+        type: string
+
+    LogIdPath:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+
+    CategoryQuery:
+      name: category
+      in: query
+      required: false
+      schema:
+        type: string
+
+    SearchQuery:
+      name: query
+      in: query
+      required: false
+      schema:
+        type: string
+
+    LimitOffset:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 10
+    OffsetParam:
+      name: offset
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 0
+
+paths:
+  /auth/signup:
+    post:
+      summary: Create new user account
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserEntity'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+
+  /auth/login:
+    post:
+      summary: Authenticate user
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password_hash]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password_hash:
+                  type: string
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+
+  /users:
+    get:
+      summary: Search users
+      operationId: searchUsers
+      parameters:
+        - $ref: '#/components/parameters/SearchQuery'
+        - $ref: '#/components/parameters/LimitOffset'
+        - name: sort_by
+          in: query
+          schema:
+            type: string
+            enum: [id, email, name, user_type, created_at, location]
+            default: created_at
+        - name: sort_order
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+      responses:
+        '200':
+          description: User search results
+          content:
+            application/json:
+              type: array
+              items:
+                $ref: '#/components/schemas/UserEntity'
+
+    /users/{user_id}:
+      get:
+        summary: Get user profile
+        operationId: getUserProfile
+        parameters:
+          - $ref: '#/components/parameters/UserIdPath'
+        responses:
+          '200':
+            description: User profile
+            content:
+              application/json:
+                $ref: '#/components/schemas/UserEntity'
+
+      put:
+        summary: Update user profile
+        operationId: updateUserProfile
+        parameters:
+          - $ref: '#/components/parameters/UserIdPath'
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserEntity'
+        responses:
+          '200':
+            description: User updated
+            content:
+              application/json:
+                $ref: '#/components/schemas/UserEntity'
+
+      delete:
+        summary: Delete user account
+        operationId: deleteUser
+        parameters:
+          - $ref: '#/components/parameters/UserIdPath'
+        responses:
+          '204':
+            description: User deleted
+
+  /user_impact:
+    get:
+      summary: Get user impact data
+      operationId: getUserImpact
+      parameters:
+        - $ref: '#/components/parameters/UserIdPath'
+      responses:
+        '200':
+          description: User impact data
+          content:
+            application/json:
+              $ref: '#/components/schemas/UserImpactEntity'
+
+    post:
+      summary: Create user impact entry
+      operationId: createUserImpact
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserImpactEntity'
+      responses:
+        '201':
+          description: Impact entry created
+          content:
+            application/json:
+              $ref: '#/components/schemas/UserImpactEntity'
+
+  /transportation_logs:
+    post:
+      summary: Log transportation activity
+      operationId: createTransportationLog
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransportationLogEntity'
+      responses:
+        '201':
+          description: Transportation log created
+          content:
+            application/json:
+              $ref: '#/components/schemas/TransportationLogEntity'
+
+    get:
+      summary: Get transportation logs
+      operationId: getTransportationLogs
+      parameters:
+        - $ref: '#/components/parameters/UserIdPath'
+        - $ref: '#/components/parameters/LimitOffset'
+      responses:
+        '200':
+          description: Transportation logs
+          content:
+            application/json:
+              type: array
+              items:
+                $ref: '#/components/schemas/TransportationLogEntity'
+
+    /transportation_logs/{id}:
+      put:
+        summary: Update transportation log
+        operationId: updateTransportationLog
+        parameters:
+          - $ref: '#/components/parameters/LogIdPath'
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransportationLogEntity'
+        responses:
+          '200':
+            description: Log updated
+            content:
+              application/json:
+                $ref: '#/components/schemas/TransportationLogEntity'
+
+      delete:
+        summary: Delete transportation log
+        operationId: deleteTransportationLog
+        parameters:
+          - $ref: '#/components/parameters/LogIdPath'
+        responses:
+          '204':
+            description: Log deleted
+
+  /goals:
+    post:
+      summary: Create new goal
+      operationId: createGoal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoalEntity'
+      responses:
+        '201':
+          description: Goal created
+          content:
+            application/json:
+              $ref: '#/components/schemas/GoalEntity'
+
+    get:
+      summary: Get user goals
+      operationId: getUserGoals
+      parameters:
+        - $ref: '#/components/parameters/UserIdPath'
+      responses:
+        '200':
+          description: User goals
+          content:
+            application/json:
+              type: array
+              items:
+                $ref: '#/components/schemas/GoalEntity'
+
+    /goals/{id}:
+      put:
+        summary: Update goal
+        operationId: updateGoal
+        parameters:
+          - $ref: '#/components/parameters/LogIdPath'
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GoalEntity'
+        responses:
+          '200':
+            description: Goal updated
+            content:
+              application/json:
+                $ref: '#/components/schemas/GoalEntity'
+
+      delete:
+        summary: Delete goal
+        operationId: deleteGoal
+        parameters:
+          - $ref: '#/components/parameters/LogIdPath'
+        responses:
+          '204':
+            description: Goal deleted
+
+  /challenges:
+    get:
+      summary: Get available challenges
+      operationId: listChallenges
+      responses:
+        '200':
+          description: Challenge list
+          content:
+            application/json:
+              type: array
+              items:
+                $ref: '#/components/schemas/ChallengeEntity'
+
+    post:
+      summary: Join challenge
+      operationId: joinChallenge
+      requestBody:
+        required: true
+        content:
+          application/json:
+            type: object
+            required: [user_id, challenge_id]
+            properties:
+              user_id:
+                type: string
+              challenge_id:
+                type: string
+              join_date:
+                type: string
+                format: date
+      responses:
+        '201':
+          description: Challenge joined
+          content:
+            application/json:
+              type: object
+              properties:
+                progress:
+                  type: number
+
+  /tips:
+    get:
+      summary: Get educational tips
+      operationId: listTips
+      parameters:
+        - $ref: '#/components/parameters/CategoryQuery'
+      responses:
+        '200':
+          description: Tips list
+          content:
+            application/json:
+              type: array
+              items:
+                $ref: '#/components/schemas/TipEntity'
+
+  /forums:
+    get:
+      summary: Get discussion forums
+      operationId: listForums
+      parameters:
+        - $ref: '#/components/parameters/CategoryQuery'
+      responses:
+        '200':
+          description: Forums list
+          content:
+            application/json:
+              type: array
+              items:
+                $ref: '#/components/schemas/ForumEntity'
+
+    post:
+      summary: Create new forum
+      operationId: createForum
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForumEntity'
+      responses:
+        '201':
+          description: Forum created
+          content:
+            application/json:
+              $ref: '#/components/schemas/ForumEntity'
+
+  /forums/{forum_id}/posts:
+    post:
+      summary: Create forum post
+      operationId: createForumPost
+      parameters:
+        - $ref: '#/components/parameters/LogIdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            type: object
+            required: [user_id, content]
+            properties:
+              user_id:
+                type: string
+              content:
+                type: string
+      responses:
+        '201':
+          description: Post created
+          content:
+            application/json:
+              type: object
+              properties:
+                id:
+                  type: string
+                created_at:
+                  type: string
+                  format: date-time
+
+  /business_profiles:
+    get:
+      summary: Get business profile
+      operationId: getBusinessProfile
+      parameters:
+        - $ref: '#/components/parameters/UserIdPath'
+      responses:
+        '200':
+          description: Business profile
+          content:
+            application/json:
+              type: object
+              properties:
+                id:
+                  type: string
+                user_id:
+                  type: string
+                company_name:
+                  type: string
+                industry:
+                  type: string
+                created_at:
+                  type: string
+                  format: date-time
+
+    post:
+      summary: Create business profile
+      operationId: createBusinessProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            type: object
+            required: [user_id, company_name, industry]
+            properties:
+              user_id:
+                type: string
+              company_name:
+                type: string
+              industry:
+                type: string
+      responses:
+        '201':
+          description: Business profile created
+          content:
+            application/json:
+              type: object
+              properties:
+                id:
+                  type: string
+                user_id:
+                  type: string
+                company_name:
+                  type: string
+                industry:
+                  type: string
+                created_at:
+                  type: string
+                  format: date-time
+
+  /supply_chain_logs:
+    post:
+      summary: Log supply chain sustainability
+      operationId: logSupplyChain
+      requestBody:
+        required: true
+        content:
+          application/json:
+            type: object
+            required: [business_profile_id, supplier_name, sustainability_rating, log_date]
+            properties:
+              business_profile_id:
+                type: string
+              supplier_name:
+                type: string
+              sustainability_rating:
+                type: string
+              log_date:
+                type: string
+                format: date
+      responses:
+        '201':
+          description: Supply chain log created
+          content:
+            application/json:
+              type: object
+              properties:
+                id:
+                  type: string
+                business_profile_id:
+                  type: string
+                supplier_name:
+                  type: string
+                sustainability_rating:
+                  type: string
+                log_date:
+                  type: string
+                  format: date
+
+  /reminders:
+    post:
+      summary: Create reminder
+      operationId: createReminder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            type: object
+            required: [user_id, reminder_type, schedule]
+            properties:
+              user_id:
+                type: string
+              reminder_type:
+                type: string
+              schedule:
+                type: object
+              is_active:
+                type: boolean
+      responses:
+        '201':
+          description: Reminder created
+          content:
+            application/json:
+              type: object
+              properties:
+                id:
+                  type: string
+                user_id:
+                  type: string
+                reminder_type:
+                  type: string
+                schedule:
+                  type: object
+                is_active:
+                  type: boolean
+
+  /user_bookmarks:
+    post:
+      summary: Create bookmark
+      operationId: createBookmark
+      requestBody:
+        required: true
+        content:
+          application/json:
+            type: object
+            properties:
+              user_id:
+                type: string
+              tip_id:
+                type: string
+                nullable: true
+              impact_explanation_id:
+                type: string
+                nullable: true
+      responses:
+        '201':
+          description: Bookmark created
+          content:
+            application/json:
+              type: object
+              properties:
+                id:
+                  type: string
+                user_id:
+                  type: string
+                tip_id:
+                  type: string
+                  nullable: true
+                impact_explanation_id:
+                  type: string
+                  nullable: true
+                created_at:
+                  type: string
+                  format: date-time

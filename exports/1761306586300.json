@@ -1,0 +1,19 @@
+{
+  "timestamp": 1761306586300,
+  "operation": {
+    "id": "webapp:react:views",
+    "refs": {
+      "id": "GV_BarcodeScanner",
+      "version": "1761306527957"
+    }
+  },
+  "projectId": "eco-10",
+  "files": [
+    {
+      "path": "/mnt/data/eco-10/vitereact/src/components/views/GV_BarcodeScanner.tsx",
+      "type": "text",
+      "size": 7610,
+      "dependencies": false
+    }
+  ]
+}
